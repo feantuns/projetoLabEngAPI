@@ -1,5 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const passport = require('passport');
+
+// Passport config
+require('./config/passport')(passport);
 
 // Database
 const db = require('./config/database');
@@ -10,6 +15,19 @@ db.authenticate()
   .catch(err => console.log('error: ' + err));
 
 const app = express();
+
+// Express Session
+app.use(
+  session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Body Parser
 app.use(bodyParser.urlencoded({ extended: false }));
