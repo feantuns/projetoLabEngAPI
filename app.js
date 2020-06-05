@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
@@ -15,6 +16,8 @@ db.authenticate()
   .catch(err => console.log('error: ' + err));
 
 const app = express();
+
+app.use(cors());
 
 // Express Session
 app.use(
