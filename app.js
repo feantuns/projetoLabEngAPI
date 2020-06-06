@@ -30,7 +30,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Body Parser
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(express.json());
 
 // Rotas
