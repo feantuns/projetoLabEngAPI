@@ -23,13 +23,27 @@ router.get('/desativados', ensureAuthenticated, (req, res) =>
 
 // Add a membro
 router.post('/', ensureAuthenticated, (req, res) => {
-  let { nome, contato, nome_responsavel, conta_responsavel } = req.body;
+  let {
+    nome,
+    contato,
+    nome_responsavel,
+    conta_responsavel,
+    data_nascimento,
+    cpf,
+  } = req.body;
   let errors = [];
 
-  if (!nome || !contato || !nome_responsavel || !conta_responsavel) {
+  if (
+    !nome ||
+    !contato ||
+    !nome_responsavel ||
+    !conta_responsavel ||
+    !data_nascimento ||
+    !cpf
+  ) {
     errors.push({
       message:
-        'Informe um nome, contato, nome de um responsável e conta de um responsável',
+        'Informe um nome, contato, nome de um responsável, data de nascimento, cpf e conta de um responsável',
     });
   }
 
@@ -38,6 +52,8 @@ router.post('/', ensureAuthenticated, (req, res) => {
     contato,
     nome_responsavel,
     conta_responsavel,
+    data_nascimento,
+    cpf,
     status: 'Ativo',
   })
     .then(membro => res.status(200).json(membro))
