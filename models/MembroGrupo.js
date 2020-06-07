@@ -9,6 +9,7 @@ const MembroGrupo = db.define(
     grupo_id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
+      onDelete: 'CASCADE',
       references: {
         model: 'grupo',
         key: 'id',
@@ -17,6 +18,7 @@ const MembroGrupo = db.define(
     membro_id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
+      onDelete: 'CASCADE',
       references: {
         model: 'membro',
         key: 'id',

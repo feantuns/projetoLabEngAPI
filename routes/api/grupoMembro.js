@@ -16,6 +16,7 @@ router.get('/:grupoId', ensureAuthenticated, (req, res) => {
   MembroGrupo.findAll({
     attributes,
     where: { grupo_id: grupoId },
+    order: [['createdAt', 'DESC']],
   })
     .then(membrosGrupos => {
       const membrosIds = membrosGrupos.map(
@@ -90,6 +91,7 @@ router.post('/:grupoId/:membroId', ensureAuthenticated, async (req, res) => {
                     [Op.or]: membrosIds,
                   },
                 },
+                order: [['createdAt', 'DESC']],
               })
                 .then(membros => res.json(membros))
                 .catch(err => console.log(err));

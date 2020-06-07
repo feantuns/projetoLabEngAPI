@@ -8,7 +8,7 @@ const Administrador = require('../../models/Administrador');
 
 // Get lista de administradores
 router.get('/', ensureAuthenticated, (req, res) =>
-  Administrador.findAll()
+  Administrador.findAll({ order: [['createdAt', 'DESC']] })
     .then(admins => res.json(admins))
     .catch(err => console.log(err))
 );
