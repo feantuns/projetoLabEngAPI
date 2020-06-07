@@ -57,6 +57,7 @@ router.put('/:membroId', ensureAuthenticated, async (req, res) => {
     conta_responsavel,
     data_nascimento,
     cpf,
+    status,
   } = req.body;
   let errors = [];
 
@@ -81,6 +82,7 @@ router.put('/:membroId', ensureAuthenticated, async (req, res) => {
     conta_responsavel: conta_responsavel || membroInformado.conta_responsavel,
     data_nascimento: data_nascimento || membroInformado.data_nascimento,
     cpf: cpf || membroInformado.cpf,
+    status: status || membroInformado.status,
   };
 
   await Membro.update({ ...updates }, { where: { id: membroId } });
