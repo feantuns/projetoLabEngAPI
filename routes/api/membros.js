@@ -1,25 +1,68 @@
 const express = require('express');
 const router = express.Router();
 const Membro = require('../../models/Membro');
+const Grupo = require('../../models/Grupo');
 const MembroGrupo = require('../../models/MembroGrupo');
 const { ensureAuthenticated } = require('../../config/auth');
 
+const findGroupsOfMembers = membros => {
+  return membros.map(async membro => {
+    let grupos = await MembroGrupo.findAll({
+      where: { membro_id: membro.dataValues.id },
+    });
+
+    if (grupos.length > 0) {
+      const novosGrupos = grupos.map(async grupo => {
+        const { grupo_id } = grupo;
+
+        const dadosGrupo = await Grupo.findOne({
+          where: { id: grupo_id },
+        });
+
+        return { grupo_id, nome: dadosGrupo.nome };
+      });
+
+      return Promise.all(novosGrupos).then(responses => ({
+        ...membro.dataValues,
+        grupos: responses,
+      }));
+    }
+
+    return { ...membro.dataValues, grupos };
+  });
+};
+
 // Get lista de membros ativos
-router.get('/', ensureAuthenticated, (req, res) =>
-  Membro.findAll({ where: { status: 'Ativo' }, order: [['createdAt', 'DESC']] })
-    .then(membros => res.json(membros))
-    .catch(err => console.log(err))
-);
+router.get('/', ensureAuthenticated, async (req, res) => {
+  let membros = await Membro.findAll({
+    where: { status: 'Ativo' },
+    order: [['createdAt', 'DESC']],
+  });
+
+  if (!membros) {
+    res.sendStatus(500);
+  }
+
+  membros = findGroupsOfMembers(membros);
+
+  Promise.all(membros).then(responses => res.json(responses));
+});
 
 // Get lista de membros desativados
-router.get('/desativados', ensureAuthenticated, (req, res) =>
-  Membro.findAll({
+router.get('/desativados', ensureAuthenticated, async (req, res) => {
+  let membros = await Membro.findAll({
     where: { status: 'Desativado' },
     order: [['createdAt', 'DESC']],
-  })
-    .then(membros => res.json(membros))
-    .catch(err => console.log(err))
-);
+  });
+
+  if (!membros) {
+    res.sendStatus(500);
+  }
+
+  membros = findGroupsOfMembers(membros);
+
+  Promise.all(membros).then(responses => res.json(responses));
+});
 
 // Add a membro
 router.post('/', ensureAuthenticated, (req, res) => {
