@@ -16,7 +16,7 @@ router.get('/', ensureAuthenticated, (req, res) =>
 // Edit a administrador
 router.put('/:adminId', ensureAuthenticated, async (req, res) => {
   const { adminId } = req.params;
-  const { nome, email, contato } = req.body;
+  const { nome, email, contato, senha } = req.body;
   let errors = [];
 
   if (!adminId) {
@@ -41,8 +41,31 @@ router.put('/:adminId', ensureAuthenticated, async (req, res) => {
     email: email || adminInformado.email,
   };
 
-  await Administrador.update({ ...updates }, { where: { id: adminId } });
-  res.sendStatus(204);
+  // Hash password
+  if (senha) {
+    bcrypt.genSalt(10, (err, salt) =>
+      bcrypt.hash(senha, salt, (err, hash) => {
+        if (err) throw err;
+
+        // Create new admin
+        Administrador.update(
+          {
+            ...updates,
+            senha: hash, // Set pasword to hashed
+          },
+          { where: { id: adminId } }
+        )
+          .then(() => res.sendStatus(204))
+          .catch(err => {
+            console.log(err);
+            return res.sendStatus(500);
+          });
+      })
+    );
+  } else {
+    await Administrador.update({ ...updates }, { where: { id: adminId } });
+    res.sendStatus(204);
+  }
 });
 
 // Delete a administrador
