@@ -13,6 +13,73 @@ router.get('/', ensureAuthenticated, (req, res) =>
     .catch(err => console.log(err))
 );
 
+// Edit a administrador
+router.put('/:adminId', ensureAuthenticated, async (req, res) => {
+  const { adminId } = req.params;
+  const { nome, email, contato } = req.body;
+  let errors = [];
+
+  if (!adminId) {
+    errors.push({ message: 'Informe o id de um administrador.' });
+  }
+
+  const adminInformado = await Administrador.findOne({
+    where: { id: adminId },
+  });
+
+  if (!adminInformado) {
+    errors.push({ message: 'O administrador informado não existe.' });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json(errors);
+  }
+
+  const updates = {
+    nome: nome || adminInformado.nome,
+    contato: contato || adminInformado.contato,
+    email: email || adminInformado.email,
+  };
+
+  await Administrador.update({ ...updates }, { where: { id: adminId } });
+  res.sendStatus(204);
+});
+
+// Delete a administrador
+router.delete('/:adminId', ensureAuthenticated, async (req, res) => {
+  const { adminId } = req.params;
+  let errors = [];
+
+  if (!adminId) {
+    errors.push({ message: 'Informe o id de um administrador.' });
+  }
+
+  const adminInformado = await Administrador.findOne({
+    where: { id: adminId },
+  });
+
+  if (!adminInformado) {
+    errors.push({ message: 'O administrador informado não existe.' });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json(errors);
+  }
+
+  const deleteAdmin = await Administrador.destroy({
+    where: {
+      id: adminId,
+    },
+  });
+
+  if (!deleteAdmin) {
+    errors.push({ message: 'Erro ao excluir membro.' });
+    return res.status(500).json(errors);
+  }
+
+  return res.sendStatus(204);
+});
+
 // Register an admin
 router.post('/register', (req, res) => {
   let { nome, email, senha, contato } = req.body;
