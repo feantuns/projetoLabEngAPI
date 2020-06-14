@@ -21,15 +21,19 @@ router.get('/:grupoId', ensureAuthenticated, (req, res) => {
       const membrosIds = membrosGrupos.map(
         membroGrupo => membroGrupo.membro_id
       );
-      Membro.findAll({
-        where: {
-          id: {
-            [Op.or]: membrosIds,
+      if (membrosIds.length > 0) {
+        Membro.findAll({
+          where: {
+            id: {
+              [Op.or]: membrosIds,
+            },
           },
-        },
-      })
-        .then(membros => res.json(membros))
-        .catch(err => console.log(err));
+        })
+          .then(membros => res.json(membros))
+          .catch(err => console.log(err));
+      } else {
+        return res.json([]);
+      }
     })
     .catch(err => console.log(err));
 });
@@ -134,6 +138,8 @@ router.delete('/:grupoId/:membroId', ensureAuthenticated, async (req, res) => {
     attributes,
     where: { grupo_id: grupoId, membro_id: membroId },
   });
+
+  console.log(membroGrupo);
 
   if (!membroGrupo) {
     errors.push({ message: 'O membro não faz parte do grupo.' });
