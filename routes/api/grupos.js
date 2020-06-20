@@ -74,15 +74,21 @@ router.delete('/:grupoId', ensureAuthenticated, async (req, res) => {
     return res.status(400).json(errors);
   }
 
-  const deleteConnectionsWithMembros = await MembroGrupo.destroy({
-    where: {
-      grupo_id: grupoId,
-    },
+  const membrosGrupo = await MembroGrupo.findAll({
+    where: { grupo_id: grupoId },
   });
 
-  if (!deleteConnectionsWithMembros) {
-    errors.push({ message: 'Erro ao excluir conexões de grupo com membro.' });
-    return res.status(500).json(errors);
+  if (membrosGrupo.length > 0) {
+    const deleteConnectionsWithMembros = await MembroGrupo.destroy({
+      where: {
+        grupo_id: grupoId,
+      },
+    });
+
+    if (!deleteConnectionsWithMembros) {
+      errors.push({ message: 'Erro ao excluir conexões de grupo com membro.' });
+      return res.status(500).json(errors);
+    }
   }
 
   const deleteGrupo = await Grupo.destroy({
