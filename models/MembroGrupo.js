@@ -1,7 +1,5 @@
 const Sequelize = require('sequelize');
 const db = require('../config/database');
-const Grupo = require('./Grupo');
-const Membro = require('./Membro');
 
 const MembroGrupo = db.define(
   'membro_grupo',

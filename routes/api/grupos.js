@@ -13,7 +13,7 @@ router.get('/', ensureAuthenticated, (req, res) =>
 
 // Add a group
 router.post('/', ensureAuthenticated, (req, res) => {
-  let { nome, modalidade } = req.body;
+  const { nome, modalidade } = req.body;
 
   Grupo.create({
     nome,
