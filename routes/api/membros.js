@@ -172,15 +172,21 @@ router.delete('/:membroId', ensureAuthenticated, async (req, res) => {
     return res.sendStatus(204);
   }
 
-  const deleteMembroFromHisGroups = await MembroGrupo.destroy({
-    where: {
-      membro_id: membroId,
-    },
+  const gruposMembro = await MembroGrupo.findAll({
+    where: { membro_id: membroId },
   });
 
-  if (!deleteMembroFromHisGroups) {
-    errors.push({ message: 'Erro ao excluir membro de seus grupos.' });
-    return res.status(500).json(errors);
+  if (gruposMembro.length > 0) {
+    const deleteMembroFromHisGroups = await MembroGrupo.destroy({
+      where: {
+        membro_id: membroId,
+      },
+    });
+
+    if (!deleteMembroFromHisGroups) {
+      errors.push({ message: 'Erro ao excluir membro de seus grupos.' });
+      return res.status(500).json(errors);
+    }
   }
 
   const deleteMembro = await Membro.destroy({
