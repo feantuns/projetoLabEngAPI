@@ -128,7 +128,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 
   // acrescentar quantidade material
   const updates = {
-    quantidade: Number(materialDaCompra.quantidade + quantidade),
+    quantidade: Number(materialDaCompra.quantidade) + Number(quantidade),
   };
 
   await Material.update({ ...updates }, { where: { id: material_id } });
@@ -209,9 +209,10 @@ router.put('/:compraId', ensureAuthenticated, async (req, res) => {
       }
     }
 
-    const newQuantidade = Number(
-      materialDaCompra.quantidade - compraInformada.quantidade + quantidade
-    );
+    const newQuantidade =
+      Number(materialDaCompra.quantidade) -
+      Number(compraInformada.quantidade) +
+      Number(quantidade);
 
     await Material.update(
       { quantidade: newQuantidade },
@@ -264,9 +265,8 @@ router.delete('/:compraId', ensureAuthenticated, async (req, res) => {
       .json([{ message: 'Erro ao buscar material para subtrair quantidade.' }]);
   }
 
-  const newQuantidade = Number(
-    materialDaCompra.quantidade - compraInformada.quantidade
-  );
+  const newQuantidade =
+    Number(materialDaCompra.quantidade) - Number(compraInformada.quantidade);
 
   await Material.update(
     { quantidade: newQuantidade },
