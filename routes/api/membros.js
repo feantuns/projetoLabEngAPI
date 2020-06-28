@@ -73,6 +73,7 @@ router.post('/', ensureAuthenticated, (req, res) => {
     conta_responsavel,
     data_nascimento,
     cpf,
+    grupos,
   } = req.body;
   let errors = [];
 
@@ -99,7 +100,19 @@ router.post('/', ensureAuthenticated, (req, res) => {
     cpf,
     status: 'Ativo',
   })
-    .then(membro => res.status(200).json(membro))
+    .then(membro => {
+      if (grupos && grupos.length > 0) {
+        const addMemberToGroups = grupos.map(grupo => {
+          return MembroGrupo.create({ membro_id: membro.id, grupo_id: grupo });
+        });
+
+        return Promise.all(addMemberToGroups).finally(() =>
+          res.status(200).json(membro)
+        );
+      } else {
+        return res.status(200).json(membro);
+      }
+    })
     .catch(err => {
       console.log(err);
       return res.sendStatus(500);
